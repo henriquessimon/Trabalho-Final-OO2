@@ -1,0 +1,89 @@
+.cardGameContainer {
+    box-shadow: 0 2px 4px var(--color-dark-purple, rgba(0, 0, 0, 0.1));
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    max-height: 380px;
+    min-height: 380px;
+    max-width: 350px;
+    background-color: #111;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.5s;
+    margin: 30px 10px;
+}
+
+.cardGameContainer:hover {
+    position: relative;
+    box-shadow: 0 8px 18px var(--color-dark-purple, rgba(0, 0, 0, 0.1));
+}
+
+.imgContainer img {
+    width: 100%;
+    position: relative;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.infoMainContainer {
+    padding: 10px 0;
+    bottom: 0;
+    width: 100%;
+    position: relative;
+}
+
+.infoContainer {
+    padding: 0 20px;
+}
+
+.platCardGameList {
+    display: flex;
+    margin: 20px 0;
+}
+
+.platCardGameListItem {
+    font-size: 13px;
+    margin-right: 10px;
+    min-width: 40px;
+    border-radius: 35px;
+    text-align: center;
+    background-color: #222;
+}
+
+.buttomContainer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+}
+
+.addCartButton {
+    padding: 8px 30px;
+    border: solid 1px var(--color-dark-purple);
+    border-radius: 15px;
+    background-color: var(--color-dark-purple);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.5s;
+}
+
+.addCartButton:hover {
+    background-color: #111;
+    z-index: 2;
+}
+
+.trashImg {
+    position: absolute;
+    bottom: 25px;
+    right: 10px;
+    z-index: 100;
+}
+
+.updateImg {
+    position: absolute;
+    bottom: 25px;
+    left: 10px;
+    z-index: 100;
+}

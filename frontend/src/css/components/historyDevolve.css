@@ -1,0 +1,18 @@
+.itemDevolucao {
+    text-align: center;
+    background-color: #111;
+    border: 1px solid #111;
+    border-radius: 7px;
+}
+
+.listDevolucao {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 0;
+    border-bottom: 2px solid var(--color-dark-purple)
+}
+
+.itemListGameReturn {
+    width: 100%;
+}

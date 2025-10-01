@@ -1,0 +1,7 @@
+.itemList {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    width: 50%;
+    border-bottom: 2px solid var(--color-dark-purple);
+}

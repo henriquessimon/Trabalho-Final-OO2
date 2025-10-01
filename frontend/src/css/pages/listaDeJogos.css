@@ -1,0 +1,188 @@
+.bodyGameList {
+    display: flex;
+    justify-content: space-around;
+    max-width: 100%;
+    flex-wrap: wrap;
+}
+
+.searchGame {
+    margin-left: 20px;
+    color: var(--color-text);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* garante que esteja acima de tudo */
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+
+  /* Centraliza o conteúdo do modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: var(--color-body);
+  padding: 20px;
+  width: 400px;
+  max-height: 500px;
+  border-radius: 8px;
+  overflow-y: scroll;
+}
+
+.buttonDivModalDelete {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.buttonModalDeleteConfirm {
+  padding: 7px 10px;
+  width: 100%;
+  margin: 0 10px;
+  background-color: var(--color-dark-purple);
+  border: 1px solid var(--color-dark-purple);
+  border-radius: 8px;
+  transition: 0.5s;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.buttonModalDeleteConfirm:hover {
+  background-color: var(--color-text);
+  border: 1px solid var(--color-text);
+  color: var(--color-dark-purple);
+  border-radius: 8px;
+}
+
+.buttonModalDeleteCancel {
+  padding: 7px 25px;
+  margin: 0 10px;
+  background-color: var(--color-text);
+  border: 1px solid var(--color-text);
+  border-radius: 8px;
+  transition: 0.5s;
+  cursor: pointer;
+  color: var(--color-dark-purple);
+}
+
+.buttonModalDeleteCancel:hover {
+  background-color: var(--color-dark-purple);
+  border: 1px solid var(--color-dark-purple);
+  color: var(--color-text);
+  border-radius: 8px;
+}
+
+.buttonModalUpdateConfirm {
+  padding: 7px 10px;
+  width: 100%;
+  margin: 0 10px;
+  background-color: var(--color-dark-purple);
+  border: 1px solid var(--color-dark-purple);
+  border-radius: 8px;
+  transition: 0.5s;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.buttonModalUpdateConfirm:hover {
+  background-color: var(--color-text);
+  border: 1px solid var(--color-text);
+  color: var(--color-dark-purple);
+  border-radius: 8px;
+}
+
+.buttonModalUpdateCancel {
+  padding: 7px 25px;
+  margin: 0 10px;
+  background-color: var(--color-text);
+  border: 1px solid var(--color-text);
+  border-radius: 8px;
+  transition: 0.5s;
+  cursor: pointer;
+  color: var(--color-dark-purple);
+}
+
+.buttonModalUpdateCancel:hover {
+  background-color: var(--color-dark-purple);
+  border: 1px solid var(--color-dark-purple);
+  color: var(--color-text);
+  border-radius: 8px;
+}
+
+.fieldRegister {
+    margin: 30px 0;
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+    label {
+        margin: 10px 5px;
+    }
+}
+
+.inputText {
+    border-bottom: 3px solid var(--color-purple);
+    max-width: 100%;
+    color: var(--text-color);
+}
+
+.gameSelects {
+    max-width: 100%;
+}
+
+.filterDiv {
+    display: flex;
+}
+
+.select2 {
+    max-height: 35px;
+}
+
+.select2-container--default .select2-selection--multiple {
+  background-color: var(--color-textarea) !important;
+  border: 1px solid var(--color-body) !important;
+  border-radius: 5px !important;
+  padding: 5px !important;
+  font-size: 14px !important;
+  color: var(--color-text) !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--color-purple-dark) !important;
+    box-shadow: 0 0 5px var(--color-purple) !important;
+}
+
+.select2-container--default .select2-results__option {
+  background-color: var(--color-body);
+  color: var(--color-text);
+  padding: 10px;
+  font-size: 14px;
+  transition: 0.5s;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--color-textarea) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected]:focus {
+  background-color: var(--color-textarea) !important;
+}
+
+.select2-dropdown {
+  background-color: var(--color-body);
+  border: 1px solid var(--color-body);
+}
+
+.select2-selection__choice {
+    background-color: var(--color-body) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-body) !important;
+}
+
+.select2-container--default .select2-results__option--selected {
+    background-color: var(--color-dark-purple) !important;
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Store</title>
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/components/header.css" />
+    <link rel="stylesheet" href="/css/components/footer.css" />
+    <link rel="stylesheet" href="/css/components/historyPurchase.css" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <div id="app">
+        <section>
+            <h3>Histórico de compras</h3>
+            <div class="containerHistory">
+
+            </div>
+        </section>
+        <div id="meuModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p></p>
+                <select id="GameDevolution" class="GameDevolution">
+                    <option value="all">Todos</option>
+                </select>
+                <div class="devolvButtonDiv">
+                    <button class="devolvButtonModal" id="devolvButtonModal">Sim, devolver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script type="module">
+        import { Header } from "/js/modules/header.js";
+        import { Footer } from "/js/modules/footer.js";
+        import { HistoryPurchase } from "/js/modules/historyPurchase.js";
+
+        function checkScroll() {
+            const scrollHeight = document.documentElement.scrollHeight;
+            const innerHeight = window.innerHeight;
+            const hasScroll = scrollHeight > innerHeight;
+            console.log(`Scroll vertical: ${hasScroll ? "SIM" : "NÃO"}`);
+            return hasScroll;
+        }
+
+        // Espera o carregamento do conteúdo
+        window.addEventListener("load", () => {
+            setTimeout(() => checkScroll(), 50); // atraso pequeno para garantir render completo
+
+            const resizeObserver = new ResizeObserver(() => {
+                checkScroll();
+            });
+
+            resizeObserver.observe(document.body);
+
+            const mutationObserver = new MutationObserver(() => {
+                checkScroll();
+            });
+
+            mutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: true
+            });
+        });
+
+        const app = document.getElementById("app");
+
+        const header = new Header();
+        app.insertBefore(header.render(), app.firstChild);
+
+        const footer = new Footer();
+        app.appendChild(footer.render());
+
+        const containerHistory = document.querySelector('.containerHistory');
+        const historyPurchase = new HistoryPurchase();
+        containerHistory.appendChild(historyPurchase.render());
+
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('meuModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        document.getElementById('devolvButtonModal').addEventListener('click', () => {
+            const purchaseId = document.getElementById('devolvButtonModal').dataset.purchaseId;
+            const select = document.getElementById('GameDevolution');
+            const selectedValue = select.value;
+
+            let gameIds;
+
+            if (selectedValue === 'all') {
+                // Pega todos os valores (ids) das options, exceto "all"
+                gameIds = Array.from(select.options)
+                    .filter(option => option.value !== 'all')
+                    .map(option => Number(option.value));
+            } else {
+                gameIds = [Number(selectedValue)];
+            }
+
+            $.ajax({
+                url: 'http://localhost:8080/purchase/return',
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    purchaseId: Number(purchaseId),
+                    gameIds: gameIds
+                }),
+                success: () => {
+                    alert('Pedido devolvido com sucesso!');
+                    document.getElementById('meuModal').style.display = 'none';
+                    location.reload();
+                },
+                error: (err) => {
+                    console.error('Erro na devolução:', err);
+                    alert('Erro ao tentar devolver o pedido.');
+                }
+            });
+        });
+
+
+    </script>
+</body>
+</html>

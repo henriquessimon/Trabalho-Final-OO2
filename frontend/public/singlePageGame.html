@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/components/header.css" />
+    <link rel="stylesheet" href="/css/components/footer.css" />
+    <link rel="stylesheet" href="/css/components/itemCompra.css" />
+    <link rel="stylesheet" href="/css/pages/comprar.css" />
+    <link rel="stylesheet" href="/css/pages/singlePageGame.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <div id="app">
+        <section>
+            <div class="TitleGamePage">
+                <h1 id="titleGame" class="titleGame"></h1>
+            </div>
+            <div class="videoTrailerGames">
+                <div class="videoTrailer">
+                </div>
+            </div>
+            <div  class="fieldGamePage">
+                <h4 id="description"></h4>
+            </div>
+            <div class="fieldGamePage">
+                <h4 id="desenvolvedor"></h4>
+            </div>
+            <div class="fieldGamePage">
+                <h4 id="releaseYear"></h4>
+            </div>
+            <div class="fieldGamePage">
+                <h4 id="releaseYear"></h4>
+            </div>
+            <div class="fieldGamePage">
+                <h4 id="price"></h4>
+            </div>
+            <ul class="fieldGamePage" id="genreList">
+                <label>Generos:</label>
+            </ul>
+            <ul class="fieldGamePage" id="platformList">
+                <label>Plataforma:</label>
+            </ul>
+        </section>
+    </div>
+
+    <script type="module">
+        import { Header } from "/js/modules/header.js";
+        import { Footer } from "/js/modules/footer.js";
+        import { ItemCompra } from "/js/modules/itemCompra.js";
+
+        const app = document.getElementById("app");
+
+        const header = new Header();
+        app.insertBefore(header.render(), app.firstChild);
+
+        const footer = new Footer();
+        app.appendChild(footer.render());
+
+        // Função para verificar scroll com jQuery
+        function checkScroll() {
+            const scrollHeight = $(document).height();
+            const innerHeight = $(window).height();
+            const $footerPage = $('footer');
+
+            if ($footerPage.length === 0) {
+                console.warn('Footer não encontrado no DOM.');
+                return false;
+            }
+
+            const hasScroll = scrollHeight > innerHeight;
+            console.log(`Scroll vertical: ${hasScroll ? "SIM" : "NÃO"}`);
+
+            $footerPage.css('position', hasScroll ? 'relative' : 'absolute');
+
+            return hasScroll;
+        }
+
+        $(window).on('load', function() {
+            setTimeout(checkScroll, 50); // atraso pequeno para garantir render completo
+
+            // Observe resize do body
+            const resizeObserver = new ResizeObserver(() => {
+                checkScroll();
+            });
+            resizeObserver.observe(document.body);
+
+            // Observe mudanças no body
+            const mutationObserver = new MutationObserver(() => {
+                checkScroll();
+            });
+            mutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: true
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            async function getGame() {
+                // Pega o parâmetro 'id' da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const gameId = urlParams.get('id');
+
+                // Busca o jogo pelo ID no backend
+                const response = await fetch(`http://localhost:8080/game/getGame/${gameId}`);
+                const game = await response.json();
+
+                console.log(game);
+                console.log(game.trailerUrl);
+
+                // Seleciona o container onde o iframe será inserido
+                const videoTrailer = document.querySelector('.videoTrailer');
+                videoTrailer.innerHTML = ''; // Limpa conteúdo antigo
+
+                // Extrai o ID do vídeo do YouTube da URL original
+                const trailerUrl = game.trailer;
+                const videoId = new URL(trailerUrl).searchParams.get("v");
+
+                if (videoId) {
+                    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+
+                    // Cria o iframe com as configurações necessárias
+                    const iframe = document.createElement('iframe');
+                    iframe.src = embedUrl;
+                    iframe.width = "560";
+                    iframe.height = "315";
+                    iframe.frameBorder = "0";
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
+
+                    // Adiciona o iframe no container
+                    videoTrailer.appendChild(iframe);
+                } else {
+                    videoTrailer.innerHTML = '<p>URL do trailer inválida ou não suportada.</p>';
+                }
+
+                const titleGame = document.getElementById('titleGame');
+                titleGame.textContent = game.name;
+
+                const description = document.getElementById('description');
+                description.textContent = game.description;
+
+                const desenvolvedor = document.getElementById('desenvolvedor');
+                desenvolvedor.textContent = `Desenvolvedor: ${game.dev.name}`;
+
+                const releaseYear = document.getElementById('releaseYear');
+                releaseYear.textContent = `Ano de lançamento: ${game.releaseYear}`;
+
+                const price = document.getElementById('price');
+                price.textContent = `Preço: R$${game.price}`;
+
+                const genreList = document.getElementById('genreList');
+                if (Array.isArray(game.genresID)) {
+                game.genresID.forEach(genre => {
+                    const li = document.createElement('li');
+                    li.textContent = genre.name;
+                    li.classList.add('ListGamePage');
+                    genreList.appendChild(li);
+                });
+                }
+
+                const platformList = document.getElementById('platformList');
+                console.log(platformList);
+
+                if (Array.isArray(game.platformsID)) {
+                game.platformsID.forEach(platform => {
+                    const li = document.createElement('li');
+                    li.textContent = platform.name;
+                    li.classList.add('ListGamePage');
+                    platformList.appendChild(li);
+                });
+                }
+            }
+
+            getGame();
+        });
+    </script>
+</body>
+</html>

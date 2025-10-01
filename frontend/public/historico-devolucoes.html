@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Store</title>
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/components/header.css" />
+    <link rel="stylesheet" href="/css/components/footer.css" />
+    <link rel="stylesheet" href="/css/components/historyDevolve.css" />
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <div id="app">
+        <section>
+            <div class="containerDevolucoes" id="containerDevolucoes">
+
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        import { Header } from "/js/modules/header.js";
+        import { Footer } from "/js/modules/footer.js";
+        import { HistoryDevolve } from "/js/modules/historyDevolve.js";
+
+        const app = document.getElementById("app");
+        const bodyGameList = document.getElementById("bodyGameList")
+
+        //RENDER HEADER
+        const header = new Header();
+        app.appendChild(header.render());
+
+        //RENDER FOOTER
+        const footer = new Footer();
+        app.appendChild(footer.render());
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const containerDevolucoes = document.getElementById('containerDevolucoes');
+            console.log(containerDevolucoes);
+            const historyDevolve = new HistoryDevolve();
+            containerDevolucoes.appendChild(historyDevolve.render());
+        });
+    </script>
+</body>
+</html>

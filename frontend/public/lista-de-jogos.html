@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games Store</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/components/header.css">
+    <link rel="stylesheet" href="/css/components/footer.css">
+    <link rel="stylesheet" href="/css/components/gameCard.css">
+    <link rel="stylesheet" href="/css/pages/listaDeJogos.css">
+    <link rel="icon" href="/static/bonfire.png">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <section>
+            <div class="filterDiv">
+                <input type="text" id="searchGame" placeholder="Buscar..." class="searchGame" />
+                <select class="selectFilter" id="genreFilter" multiple>
+                    <option value=""></option>
+                </select>
+                <select class="selectFilter" id="platformFilter" multiple>
+                    <option value=""></option>
+                </select>
+                <select class="selectFilter" id="devFilter" multiple>
+                    <option value=""></option>
+                </select>
+            </div>
+            <div id="bodyGameList" class="bodyGameList"></div>
+        </section>
+    </div>
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p>Tem certeza que deseja excluir este jogo?</p>
+            <div class="buttonDivModalDelete">
+                <button id="confirmDeleteBtn" class="buttonModalDeleteConfirm">Sim, excluir</button>
+                <button id="cancelDeleteBtn" class="buttonModalDeleteCancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div id="updateModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p>Tem certeza que deseja excluir este jogo?</p>
+            <div class="buttonDivModalUpdate">
+                <form id="gameForm">
+                    <div class="fieldRegister">
+                        <label>Nome</label>
+                        <input type="text" placeholder="Nome..." name="gameName" class="inputText" required />
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Link do trailer</label>
+                        <input type="text" placeholder="trailer..." name="gameTrailer" class="inputText" />
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Preço</label>
+                        <input type="number" step="0.01" placeholder="Preço..." name="gamePrice" class="inputText" required />
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Descrição</label>
+                        <textarea rows="4" cols="50" name="gameDesc" required>Descrição</textarea>
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Capa do Jogo</label>
+                        <input type="text" placeholder="Imagem Link" name="gameImgUrl" class="inputText" />
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Gênero</label>
+                        <select name="gameGenre" class="gameSelects" multiple required>
+                            <option value=""> Selecione o Gênero</option>
+                        </select>
+                    </div>
+                    <div class="fieldRegister">
+                        <label>Plataforma</label>
+                        <select name="gamePlatform" class="gameSelects" multiple required>
+                            <option value="">Selecione a plataforma</option>
+                        </select>
+                    </div>
+                    <div class="buttonDivModalDelete">
+                        <button type="submit" id="confirmUpdateBtn" class="buttonModalUpdateConfirm">Sim, excluir</button>
+                        <button type="button" id="cancelUpdateBtn" class="buttonModalUpdateCancel">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { Header } from "/js/modules/header.js";
+        import { Footer } from "/js/modules/footer.js";
+        import { GameCard } from "/js/modules/gameCard.js";
+
+        // Função para verificar scroll com jQuery
+        function checkScroll() {
+            const scrollHeight = $(document).height();
+            const innerHeight = $(window).height();
+            const $footerPage = $('footer');
+
+            if ($footerPage.length === 0) {
+                console.warn('Footer não encontrado no DOM.');
+                return false;
+            }
+
+            const hasScroll = scrollHeight > innerHeight;
+            console.log(`Scroll vertical: ${hasScroll ? "SIM" : "NÃO"}`);
+
+            $footerPage.css('position', hasScroll ? 'relative' : 'absolute');
+
+            return hasScroll;
+        }
+
+        $(window).on('load', function() {
+            setTimeout(checkScroll, 50); // atraso pequeno para garantir render completo
+
+            // Observe resize do body
+            const resizeObserver = new ResizeObserver(() => {
+                checkScroll();
+            });
+            resizeObserver.observe(document.body);
+
+            // Observe mudanças no body
+            const mutationObserver = new MutationObserver(() => {
+                checkScroll();
+            });
+            mutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: true
+            });
+        });
+
+        $(function() { // Document ready
+
+            const $app = $("#app");
+            const $bodyGameList = $("#bodyGameList");
+
+            // RENDER HEADER
+            const header = new Header();
+            $app.append(header.render());
+
+            // RENDER FOOTER
+            const footer = new Footer();
+            $app.append(footer.render());
+
+            async function getGames() {
+                try {
+                    const response = await fetch("http://localhost:8080/game");
+                    const data = await response.json();
+
+                    $bodyGameList.empty(); // limpa o container
+
+                    data.forEach(game => {
+                        console.log(game);
+                        const card = new GameCard(game);
+                        $bodyGameList.append(card.render());
+                    });
+                } catch(error) {
+                    console.error("Erro: ", error);
+                }
+            }
+
+            getGames();
+
+            // Evento de input para busca com jQuery
+            $('#searchGame').on('input', function () {
+                let query = $(this).val();
+
+                fetch(`http://localhost:8080/game/search?name=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        $bodyGameList.empty();
+
+                        if (data.length > 0) {
+                            data.forEach(game => {
+                                const card = new GameCard(game);
+                                $bodyGameList.append(card.render());
+                            });
+                        }
+                    });
+            });
+
+            // Evento de clique delegado nos cards
+            $('#bodyGameList').on('click', '.cardGameContainer', function (e) {
+                // Evita que o clique em botões dentro do card (como "Comprar", "Lixeira" e "Editar") acione o redirecionamento
+                if (
+                    $(e.target).closest('.addCartButton').length ||
+                    $(e.target).closest('.trashImg').length ||
+                    $(e.target).closest('.updateImg').length
+                ) {
+                    return;
+                }
+
+                const gameId = e.currentTarget.getAttribute('data-game-id');
+                window.location.href = `http://localhost:8080/singlePageGame.html?id=${gameId}`;
+            });
+
+
+            
+            //FILTERS
+
+            //GENERO
+            function getGenres() {
+                $.ajax({
+                    url: "http://localhost:8080/genre/getAll",
+                    method: "GET",
+                    success: function(genres) {
+                        const $genreFilter = $('#genreFilter');
+                        $genreFilter.empty(); // evita duplicações
+
+                        genres.forEach(genre => {
+                            $genreFilter.append(`<option value="${genre.id}">${genre.name}</option>`);
+                        });
+
+                        $genreFilter.select2({
+                            placeholder: "Selecione o Gênero",
+                            allowClear: true,
+                            width: '100%'
+                        });
+                    },
+                    error: function() {
+                        console.error("Erro ao carregar gêneros");
+                    }
+                });
+            }
+
+            //PLATAFORMAS
+            function getPlatforms() {
+                $.ajax({
+                    url: "http://localhost:8080/platform/getAll",
+                    method: "GET",
+                    success: function(platforms) {
+                        const $platformFilter = $('#platformFilter');
+                        $platformFilter.empty();
+
+                        platforms.forEach(platform => {
+                            $platformFilter.append(`<option value="${platform.id}">${platform.name}</option>`);
+                        });
+
+                        $platformFilter.select2({
+                            placeholder: "Selecione a Plataforma",
+                            allowClear: true,
+                            width: '100%'
+                        });
+                    },
+                    error: function() {
+                        console.error("Erro ao carregar plataformas");
+                    }
+                });
+            }
+
+            //DEV
+            function getDev() {
+                $.ajax({
+                    url: "http://localhost:8080/dev/getAll",
+                    method: "GET",
+                    success: function(devs) {
+                        const $devFilter = $('#devFilter');
+                        $devFilter.empty();
+
+                        devs.forEach(dev => {
+                            $devFilter.append(`<option value="${dev.id}">${dev.name}</option>`);
+                        });
+
+                        $devFilter.select2({
+                            placeholder: "Selecione o Desenvolvedor",
+                            allowClear: true,
+                            width: '100%'
+                        });
+                    },
+                    error: function() {
+                        console.error("Erro ao carregar desenvolvedores");
+                    }
+                });
+            }
+
+            getGenres();
+            getPlatforms();
+            getDev();
+
+
+            function getSelectedValues($select) {
+                return $select.val() || [];
+            }
+
+            function fetchFilteredGamesAjax() {
+                const genres = getSelectedValues($('#genreFilter'));
+                const platforms = getSelectedValues($('#platformFilter'));
+                const devs = getSelectedValues($('#devFilter'));
+
+                const params = new URLSearchParams();
+
+                genres.forEach(id => params.append('genres', id));
+                platforms.forEach(id => params.append('platforms', id));
+                devs.forEach(id => params.append('devs', id));
+
+                $.ajax({
+                    url: `http://localhost:8080/game/filter?${params.toString()}`,
+                    method: "GET",
+                    success: function(data) {
+                        const $bodyGameList = $('#bodyGameList');
+                        $bodyGameList.empty();
+
+                        if (data.length > 0) {
+                            data.forEach(game => {
+                                const card = new GameCard(game);
+                                $bodyGameList.append(card.render());
+                            });
+                        } else {
+                            $bodyGameList.append('<p>Nenhum jogo encontrado com os filtros selecionados.</p>');
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Erro ao buscar jogos filtrados:", textStatus, errorThrown, jqXHR.responseText);
+                    }
+                });
+            }
+
+            $('#genreFilter, #platformFilter, #devFilter').on('change', fetchFilteredGamesAjax);
+
+        });
+    </script>
+</body>
+</html>

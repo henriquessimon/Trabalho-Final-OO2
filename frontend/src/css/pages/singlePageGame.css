@@ -1,0 +1,23 @@
+.videoTrailerGames {
+    align-items: center;
+    text-align: center;
+}
+
+.TitleGamePage {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.titleGame {
+    font-size: 29px;
+}
+
+.fieldGamePage {
+    margin: 30px 0;
+    display: flex;
+    flex-flow: row;
+}
+
+.ListGamePage {
+    margin: 0 5px;
+}

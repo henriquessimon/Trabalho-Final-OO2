@@ -1,0 +1,105 @@
+.buttonPurchaseContainer {
+    margin: 40px 0;
+}
+
+.purchaseButton {
+    padding: 8px 30px;
+    border: solid 1px var(--color-dark-purple);
+    border-radius: 15px;
+    background-color: var(--color-dark-purple);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.5s;
+}
+
+.purchaseButton:hover  {
+    border: solid 1px var(--color-text);
+    background-color: var(--color-text);
+    color: var(--color-dark-purple);
+}
+
+.continuePurchaseButton {
+    padding: 8px 30px;
+    border: solid 1px var(--color-text);
+    border-radius: 15px;
+    background-color: var(--color-text);
+    color: var(--color-dark-purple);
+    cursor: pointer;
+    transition: background 0.5s;
+}
+
+.continuePurchaseButton:hover {
+    border: solid 1px var(--color-dark-purple);
+    background-color: var(--color-dark-purple);
+    color: var(--color-text);
+}
+
+.totalDiv {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    width: 50%;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #292929;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 0 10px black;
+}
+
+.hidden {
+  display: none;
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.confirmPurchase {
+    margin: 20px 0;
+    padding: 10px 30px;
+    background-color: var(--color-dark-purple);
+    color: var(--color-text);
+    border: 1px solid #292929;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.confirmPurchase:hover {
+    background-color: var(--color-text);
+    color: var(--color-dark-purple);
+}
+
+.totalModalDiv {
+    margin: 20px 0;
+}
+
+.fieldInputModal {
+    margin: 20px 0;
+}
+
+.inputModalPurchase {
+    color: var(--color-text);
+}

@@ -1,0 +1,107 @@
+:root {
+    /*Cores*/
+    --color-body: #292929;
+    --color-purple: #8728ef;
+    --color-dark-purple: #601186;
+    --color-pink: #dc7eff;
+    --color-text: #ddd;
+    --color-textarea: #494949;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    font-size: 19px;
+    list-style: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: var(--color-body);
+    margin-top: 100px;
+    color: var(--color-text);
+}
+
+section {
+    margin: 0 20%;
+    padding: 7% 0;
+}
+
+a {
+    color: var(--color-text);
+    transition: color 0.5s;
+}
+
+a:hover {
+    color: var(--color-pink);
+}
+
+input {
+    padding: 5px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background-color: var(--color-body);
+}
+
+input:focus {
+    outline: none;
+    border-bottom: 3px solid var(--color-pink);
+}
+
+select {
+    padding-bottom: 5px;
+    margin: 0 0 30px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 3px solid var(--color-purple);
+    background-color: transparent;
+    color: var(--color-text);
+}
+
+select:focus {
+    outline: none;
+    border-bottom: 3px solid var(--color-pink)
+}
+
+option {
+    background-color: var(--color-body);
+}
+
+textarea {
+    background-color: var(--color-textarea);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: var(--color-text);
+    padding: 20px;
+}
+
+textarea:focus {
+    outline: none;
+    border: 3px solid var(--color-pink);
+}
+
+h6 {
+    font-size: 14px;
+}
+
+.borderDiv {
+    max-height: 1px;
+    background: linear-gradient(to right, var(--color-purple), var(--color-pink));
+}
+
+.borderDiv span {
+    visibility: hidden;
+}
+
+.bodyContainer {
+    margin: 0 20%;
+    padding: 20% 0;
+}
+
+.searchGame {
+    margin: 40px 0;
+}

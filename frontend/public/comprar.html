@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Game Store</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/components/header.css" />
+  <link rel="stylesheet" href="/css/components/footer.css" />
+  <link rel="stylesheet" href="/css/components/itemCompra.css" />
+  <link rel="stylesheet" href="/css/pages/comprar.css" />
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <section>
+      <div id="itemContainer" class="itemContainer"></div>
+      <div class="totalDiv">
+        <div class="total">
+          <h5>Total:</h5>
+        </div>
+        <div class="total">
+          <h5 id="totalValue"></h5>
+        </div>
+      </div>
+      <div class="buttonPurchaseContainer">
+        <button class="purchaseButton" id="purchaseButton">Finalizar compra</button>
+        <button class="continuePurchaseButton" id="continuePurchaseButton">Continuar Comprando</button>
+      </div>
+    </section>
+    <div id="purchaseModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Confirmar Compra</h2>
+        <p>Você deseja finalizar sua compra?</p>
+        <div class="totalModalDiv" id="totalModalDiv">
+          <h2 class="totalValueModal" id="totalValueModal"></h2>
+        </div>
+        <form method="POST" id="formModalPurchase">
+          <div class="fieldInputModal">
+            <label>Nome</label>
+            <input class="inputModalPurchase" type="text" placeholder="Nome"/>
+          </div>
+          <div class="fieldInputModal">
+            <label>email</label>
+            <input class="inputModalPurchase" type="email" placeholder="email@gmail.com"/>
+          </div>
+          <button id="confirmPurchase" class="confirmPurchase">Sim, finalizar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script sem módulo que usa jQuery -->
+  <script>
+    $(document).ready(function () {
+      function checkScroll() {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const innerHeight = window.innerHeight;
+        const footerPage = $('footer')[0];
+        const hasScroll = scrollHeight > innerHeight;
+
+        if (footerPage) {
+          footerPage.style.position = hasScroll ? "relative" : "absolute";
+        }
+        return hasScroll;
+      }
+
+      setTimeout(() => checkScroll(), 50);
+
+      const resizeObserver = new ResizeObserver(() => checkScroll());
+      resizeObserver.observe(document.body);
+
+      const mutationObserver = new MutationObserver(() => checkScroll());
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+      });
+    });
+  </script>
+
+  <!-- Script módulo separado para importar Header, Footer, ItemCompra -->
+  <script type="module">
+    import { Header } from "/js/modules/header.js";
+    import { Footer } from "/js/modules/footer.js";
+    import { ItemCompra } from "/js/modules/itemCompra.js";
+
+    const app = document.getElementById("app");
+
+    const header = new Header();
+    app.insertBefore(header.render(), app.firstChild);
+
+    const footer = new Footer();
+    app.appendChild(footer.render());
+
+    const continuePurchaseButton = document.getElementById('continuePurchaseButton');
+    continuePurchaseButton.addEventListener('click', () => {
+      window.location.href = 'http://localhost:8080/lista-de-jogos.html';
+    })
+
+    // Requisição ao carrinho de visitante
+    $.ajax({
+      url: "http://localhost:8080/purchase/cart/guest",
+      method: "GET",
+      contentType: "application/json",
+      success: function(response) {
+        const purchaseItems = response.items || [];
+
+        console.log('🛒 Resposta completa da API:', response);
+        console.log('📦 Itens da compra:', purchaseItems);
+
+        purchaseItems.forEach(item => {
+          console.log('🎮 Objeto recebido no forEach (item.game):', item.game);
+
+          // Verifica se o item.game existe antes de tentar renderizar
+          if (item.game) {
+            const itemCompra = new ItemCompra(item.game);
+            const itemContainer = document.getElementById('itemContainer');
+            itemContainer.appendChild(itemCompra.render());
+          } else {
+            console.warn('⚠️ Atenção: item.game está null ou indefinido. Ignorado.');
+          }
+        });
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error("❌ Erro ao buscar o carrinho do visitante:", {
+          status: jqXHR.status,
+          response: jqXHR.responseText,
+          textStatus,
+          errorThrown
+        });
+      }
+    });
+
+
+    const totalValue = document.getElementById('totalValue');
+
+    const purchaseButton = document.getElementById('purchaseButton');
+    const modal = document.getElementById('purchaseModal');
+    const closeButton = modal.querySelector('.close-button');
+    const confirmPurchase = document.getElementById('confirmPurchase');
+    const totalValueModal = document.getElementById('totalValueModal');
+    const formModalPurchase = document.getElementById('formModalPurchase');
+
+    // Abre o modal ao clicar no botão
+    purchaseButton.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+    });
+
+    // Fecha o modal ao clicar no "X"
+    closeButton.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    // Fecha ao clicar fora do conteúdo
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+
+    let pedido = null;
+    let pedidoCarregado = false;
+
+    $.ajax({
+      url: "http://localhost:8080/purchase/pedido",
+      method: "GET",
+      contentType: "application/json",
+      success: function(purchase) {
+        totalValue.textContent = `R$${purchase.totalValue}`;
+        totalValueModal.textContent = `Total: R$${purchase.totalValue}`;
+        pedido = purchase.id;
+        pedidoCarregado = true;
+        console.log("🆔 ID salvo como pedido:", pedido);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error("❌ Erro ao carregar pedido:", {
+          status: jqXHR.status,
+          response: jqXHR.responseText,
+          textStatus,
+          errorThrown
+        });
+      }
+    });
+
+
+    confirmPurchase.addEventListener('click', async (event) => {
+      event.preventDefault();
+
+      if (!pedidoCarregado || !pedido) {
+        alert("O pedido ainda está sendo carregado. Por favor, aguarde.");
+        return;
+      }
+
+      const name = formModalPurchase.querySelector('input[type="text"]').value.trim();
+      const email = formModalPurchase.querySelector('input[type="email"]').value.trim();
+
+      if (!email || !name) {
+        alert("Preencha nome e email");
+        return;
+      }
+
+      let user = null;
+
+      try {
+        const response = await fetch(`http://localhost:8080/user/getUser?email=${encodeURIComponent(email)}`);
+
+        if (response.ok) {
+          user = await response.json();
+
+          if (user.name.toLowerCase() !== name.toLowerCase()) {
+            alert("O nome informado não confere com o nome da conta existente.");
+            return;
+          }
+        } else if (response.status === 404) {
+          const createResponse = await fetch("http://localhost:8080/user/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email })
+          });
+
+          if (createResponse.ok) {
+            user = await createResponse.json();
+          } else {
+            alert("Erro ao registrar novo usuário.");
+            return;
+          }
+        } else {
+          alert("Erro ao verificar usuário.");
+          return;
+        }
+
+        const dadosCompra = {
+          purchaseId: pedido,
+          userId: user?.id,
+          completed: true
+        };
+
+        console.log("📦 Dados enviados para /purchase/update:", dadosCompra);
+
+        $.ajax({
+          url: "http://localhost:8080/purchase/update",
+          method: "PUT",
+          contentType: "application/json",
+          data: JSON.stringify(dadosCompra),
+          success: function(updatedPurchase) {
+            console.log("✅ Compra atualizada:", updatedPurchase);
+            alert("Compra finalizada com sucesso!");
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.error("❌ Erro ao atualizar compra:", {
+              status: jqXHR.status,
+              response: jqXHR.responseText,
+              textStatus,
+              errorThrown
+            });
+            alert("Erro ao registrar compra.");
+          }
+        });
+
+      } catch (err) {
+        console.error("Erro inesperado:", err);
+        alert("Erro inesperado ao processar a compra.");
+      }
+    });
+
+
+  </script>
+</body>
+</html>
